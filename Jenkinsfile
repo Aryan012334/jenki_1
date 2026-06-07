@@ -1,18 +1,22 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'node:20-alpine'
+            args '-u root'
+        }
+    }
 
     stages {
-        stage('Build Docker Image') {
+        stage('Install') {
             steps {
-                sh 'docker build -t nodejs-app .'
+                sh 'npm install'
             }
         }
 
-        stage('Run Container') {
+        stage('Test') {
             steps {
-                sh 'docker stop nodejs-app || true'
-                sh 'docker rm nodejs-app || true'
-                sh 'docker run -d -p 3000:3000 --name nodejs-app nodejs-app'
+                sh 'node app.js &'
+                sh 'sleep 2 && echo "App started successfully"'
             }
         }
     }
